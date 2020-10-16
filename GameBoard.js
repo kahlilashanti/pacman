@@ -19,5 +19,35 @@ class GameBoard {
         this.grid = [];
         this.DOMGrid.innerHTML = '';
         this.DOMGrid.style.cssText = `grid-template-columns: repeat(${GRID_SIZE}, ${CELL_SIZE}px)`;
+        level.forEach((square) => {
+            const div = document.createElement('div');
+            div.classList.add('square', CLASS_LIST[square]);
+            div.style.cssText = `width: ${CELL_SIZE}px; height: ${CELL_SIZE}px;`
+            //we have created a grid, so now append it to the DOMGrid
+            this.DOMGrid.appendChild(div);
+            //add the grid to the array
+            this.grid.push(div);
+
+            if (CLASS_LIST[square] === OBJECT_TYPE.DOT) this.dotCount++;
+        })
     }
+
+    addObject(pos, classes) {
+        this.grid[pos].classList.add(...classes);
+    }
+
+    removeObject(pos, classes) {
+        this.grid[pos].classList.remove(...classes);
+    }
+
+    //to see if the object exists on the grid
+    objectExist(pos, object) {
+        return this.grid[pos].classList.contains(object);
+    }
+
+    //to rotate PacMan on the grid
+    rotateDiv(pos, deg) {
+        this.grid[pos].style.transform = `rotate(${deg}deg)`;
+    }
+
 }
