@@ -50,4 +50,12 @@ class GameBoard {
         this.grid[pos].style.transform = `rotate(${deg}deg)`;
     }
 
+    //create static method is somethign you can call without instantiating the class
+    static createGameBoard(DOMGrid, level) {
+        const board = new this(DOMGrid);
+        board.createGrid(level);
+        return board;
+    }
 }
+
+export default GameBoard;
