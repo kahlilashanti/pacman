@@ -41,7 +41,7 @@ class GameBoard {
     }
 
     //to see if the object exists on the grid
-    objectExist(pos, object) {
+    objectExist = (pos, object) => {
         return this.grid[pos].classList.contains(object);
     }
 
@@ -55,7 +55,7 @@ class GameBoard {
         const board = new this(DOMGrid);
         board.createGrid(level);
         return board;
-    }
+    };
 }
 
 export default GameBoard;

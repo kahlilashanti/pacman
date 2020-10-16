@@ -1,0 +1,1 @@
+1. use npm start from terminal
