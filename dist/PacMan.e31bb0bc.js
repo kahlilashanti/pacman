@@ -257,6 +257,23 @@ function _createClass(Constructor, protoProps, staticProps) {
 }
 
 module.exports = _createClass;
+},{}],"node_modules/@babel/runtime/helpers/defineProperty.js":[function(require,module,exports) {
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+module.exports = _defineProperty;
 },{}],"GameBoard.js":[function(require,module,exports) {
 "use strict";
 
@@ -271,13 +288,20 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
 var _setup = require("./setup");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var GameBoard = /*#__PURE__*/function () {
   function GameBoard(DOMGrid) {
+    var _this = this;
+
     (0, _classCallCheck2.default)(this, GameBoard);
+    (0, _defineProperty2.default)(this, "objectExist", function (pos, object) {
+      return _this.grid[pos].classList.contains(object);
+    });
     this.dotCount = 0;
     this.grid = [];
     this.DOMGrid = DOMGrid;
@@ -294,7 +318,7 @@ var GameBoard = /*#__PURE__*/function () {
   }, {
     key: "createGrid",
     value: function createGrid(level) {
-      var _this = this;
+      var _this2 = this;
 
       this.dotCount = 0;
       this.grid = [];
@@ -305,12 +329,12 @@ var GameBoard = /*#__PURE__*/function () {
         div.classList.add('square', _setup.CLASS_LIST[square]);
         div.style.cssText = "width: ".concat(_setup.CELL_SIZE, "px; height: ").concat(_setup.CELL_SIZE, "px;"); //we have created a grid, so now append it to the DOMGrid
 
-        _this.DOMGrid.appendChild(div); //add the grid to the array
+        _this2.DOMGrid.appendChild(div); //add the grid to the array
 
 
-        _this.grid.push(div);
+        _this2.grid.push(div);
 
-        if (_setup.CLASS_LIST[square] === _setup.OBJECT_TYPE.DOT) _this.dotCount++;
+        if (_setup.CLASS_LIST[square] === _setup.OBJECT_TYPE.DOT) _this2.dotCount++;
       });
     }
   }, {
@@ -329,13 +353,8 @@ var GameBoard = /*#__PURE__*/function () {
     } //to see if the object exists on the grid
 
   }, {
-    key: "objectExist",
-    value: function objectExist(pos, object) {
-      return this.grid[pos].classList.contains(object);
-    } //to rotate PacMan on the grid
-
-  }, {
     key: "rotateDiv",
+    //to rotate PacMan on the grid
     value: function rotateDiv(pos, deg) {
       this.grid[pos].style.transform = "rotate(".concat(deg, "deg)");
     } //create static method is somethign you can call without instantiating the class
@@ -353,17 +372,120 @@ var GameBoard = /*#__PURE__*/function () {
 
 var _default = GameBoard;
 exports.default = _default;
-},{"@babel/runtime/helpers/toConsumableArray":"node_modules/@babel/runtime/helpers/toConsumableArray.js","@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js","./setup":"setup.js"}],"index.js":[function(require,module,exports) {
+},{"@babel/runtime/helpers/toConsumableArray":"node_modules/@babel/runtime/helpers/toConsumableArray.js","@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js","@babel/runtime/helpers/defineProperty":"node_modules/@babel/runtime/helpers/defineProperty.js","./setup":"setup.js"}],"Pacman.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _setup = require("./setup");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Pacman = /*#__PURE__*/function () {
+  function Pacman(speed, startPos) {
+    (0, _classCallCheck2.default)(this, Pacman);
+    this.pos = startPos;
+    this.speed = speed;
+    this.dir = null;
+    this.timer = 0;
+    this.powerPill = false;
+    this.rotation = true;
+  } //is Pacman ready to move or not
+
+
+  (0, _createClass2.default)(Pacman, [{
+    key: "shouldMove",
+    value: function shouldMove() {
+      if (!this.dir) return false; //this tells us if we should move or not
+
+      if (this.timer === this.speed) {
+        this.timer = 0;
+        return true;
+      }
+
+      this.timer++;
+    } //calculate the next move for PacMan
+
+  }, {
+    key: "getNextMove",
+    value: function getNextMove(objectExist) {
+      var nextMovePos = this.pos + this.dir.movement;
+
+      if (objectExist(nextMovePos, _setup.OBJECT_TYPE.WALL) || objectExist(nextMovePos, _setup.OBJECT_TYPE.GHOSTLAIR)) {
+        //if pacman collides with a wall or ghost nothing happens
+        nextMovePos = this.pos;
+      }
+
+      return {
+        nextMovePos: nextMovePos,
+        direction: this.dir
+      };
+    }
+  }, {
+    key: "makeMove",
+    value: function makeMove() {
+      var classesToRemove = [_setup.OBJECT_TYPE.PACMAN];
+      var classesToAdd = [_setup.OBJECT_TYPE.PACMAN];
+      return {
+        classesToRemove: classesToRemove,
+        classesToAdd: classesToAdd
+      };
+    }
+  }, {
+    key: "setnewPos",
+    value: function setnewPos(nextMovePos) {
+      this.pos = nextMovePos;
+    }
+  }, {
+    key: "handleKeyInput",
+    value: function handleKeyInput(e, objectExist) {
+      //check to see if key input is working
+      console.log(e);
+      var dir;
+
+      if (e.keyCode >= 37 && e.keyCode <= 40) {
+        //if it is up, down, left or right 
+        //change direction to the corresponding key
+        dir = _setup.DIRECTIONS[e.key];
+      } else {
+        return;
+      } //pacman should only be able to change directions at an intersection in the grid
+
+
+      var nextMovePos = this.pos + dir.movement; //check to see if pacman hits a wall
+
+      if (objectExist(nextMovePos, _setup.OBJECT_TYPE.WALL)) return; //do nothing
+      //otherwise set the direction
+
+      this.dir = dir;
+    }
+  }]);
+  return Pacman;
+}();
+
+var _default = Pacman;
+exports.default = _default;
+},{"@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js","./setup":"setup.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
 var _setup = require("./setup");
 
 var _GameBoard = _interopRequireDefault(require("./GameBoard"));
 
+var _Pacman = _interopRequireDefault(require("./Pacman"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // console.log('Working!');
 //import classes
+//import Pacman
 //grab DOM elements
 var gameGrid = document.querySelector('#game');
 var scoreTable = document.querySelector('#score');
@@ -388,8 +510,28 @@ function checkCollision(pacman, ghosts) {}
 
 function gameLoop(pacman, ghosts) {}
 
-function startGame() {}
-},{"./setup":"setup.js","./GameBoard":"GameBoard.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+function startGame() {
+  // console.log('dammitman')
+  //reset variables
+  gameWin = false;
+  powerPillActive = false;
+  score = 0;
+  startButton.classList.add('hide'); //new game grid each new game
+
+  gameBoard.createGrid(_setup.LEVEL); //new speed and position
+
+  var pacman = new _Pacman.default(2, 287); //make pacman appear on the board
+
+  gameBoard.addObject(287, [_setup.OBJECT_TYPE.PACMAN]); //add event listener to control pacman
+
+  document.addEventListener('keydown', function (e) {
+    return pacman.handleKeyInput(e, gameBoard.objectExist);
+  });
+} //initialize game
+
+
+startButton.addEventListener('click', startGame);
+},{"./setup":"setup.js","./GameBoard":"GameBoard.js","./Pacman":"Pacman.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
