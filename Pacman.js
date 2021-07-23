@@ -44,7 +44,7 @@ class Pacman {
         return { classesToRemove, classesToAdd }
     }
 
-    setnewPos(nextMovePos) {
+    setNewPos(nextMovePos) {
         this.pos = nextMovePos;
     }
 

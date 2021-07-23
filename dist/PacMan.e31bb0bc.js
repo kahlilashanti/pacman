@@ -357,6 +357,30 @@ var GameBoard = /*#__PURE__*/function () {
     //to rotate PacMan on the grid
     value: function rotateDiv(pos, deg) {
       this.grid[pos].style.transform = "rotate(".concat(deg, "deg)");
+    } //to move pacman and the ghosts
+
+  }, {
+    key: "moveCharacter",
+    value: function moveCharacter(character) {
+      if (character.shouldMove()) {
+        var _character$getNextMov = character.getNextMove(this.objectExist),
+            nextMovePos = _character$getNextMov.nextMovePos,
+            direction = _character$getNextMov.direction;
+
+        var _character$makeMove = character.makeMove(),
+            classesToRemove = _character$makeMove.classesToRemove,
+            classesToAdd = _character$makeMove.classesToAdd;
+
+        if (character.rotation && nextMovePos !== character.pos) {
+          this.rotateDiv(nextMovePos, character.dir.rotation);
+          this.rotateDiv(character.pos, 0);
+        } //this moves the character on the grid
+
+
+        this.removeObject(character.pos, classesToRemove);
+        this.addObject(nextMovePos, classesToAdd);
+        character.setNewPos(nextMovePos, direction);
+      }
     } //create static method is somethign you can call without instantiating the class
 
   }], [{
@@ -439,8 +463,8 @@ var Pacman = /*#__PURE__*/function () {
       };
     }
   }, {
-    key: "setnewPos",
-    value: function setnewPos(nextMovePos) {
+    key: "setNewPos",
+    value: function setNewPos(nextMovePos) {
       this.pos = nextMovePos;
     }
   }, {
@@ -508,7 +532,10 @@ function gameOver(pacman, grid) {}
 
 function checkCollision(pacman, ghosts) {}
 
-function gameLoop(pacman, ghosts) {}
+function gameLoop(pacman, ghosts) {
+  // console.log('it works!')
+  gameBoard.moveCharacter(pacman);
+}
 
 function startGame() {
   // console.log('dammitman')
@@ -527,6 +554,9 @@ function startGame() {
   document.addEventListener('keydown', function (e) {
     return pacman.handleKeyInput(e, gameBoard.objectExist);
   });
+  timer = setInterval(function () {
+    return gameLoop(pacman);
+  }, GLOBAL_SPEED);
 } //initialize game
 
 
@@ -559,7 +589,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58014" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57144" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -50,6 +50,27 @@ class GameBoard {
         this.grid[pos].style.transform = `rotate(${deg}deg)`;
     }
 
+    //to move pacman and the ghosts
+    moveCharacter(character) {
+        if (character.shouldMove()) {
+            const { nextMovePos, direction } = character.getNextMove(
+                this.objectExist
+            );
+            const { classesToRemove, classesToAdd } = character.makeMove();
+
+            if (character.rotation && nextMovePos !== character.pos) {
+                this.rotateDiv(nextMovePos, character.dir.rotation);
+                this.rotateDiv(character.pos, 0)
+            }
+            //this moves the character on the grid
+            this.removeObject(character.pos, classesToRemove);
+            this.addObject(nextMovePos, classesToAdd);
+
+            character.setNewPos(nextMovePos, direction);
+        }
+    }
+
+
     //create static method is somethign you can call without instantiating the class
     static createGameBoard(DOMGrid, level) {
         const board = new this(DOMGrid);
