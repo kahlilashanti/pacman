@@ -64,7 +64,7 @@ class Pacman {
         //pacman should only be able to change directions at an intersection in the grid
         const nextMovePos = this.pos + dir.movement;
         //check to see if pacman hits a wall
-        if (objectExist(nextMovePos, OBJECT_TYPE.WALL)) return
+        if (objectExist(nextMovePos, OBJECT_TYPE.WALL) || objectExist(nextMovePos, OBJECT_TYPE.GHOSTLAIR)) return;
         //do nothing
         //otherwise set the direction
         this.dir = dir;

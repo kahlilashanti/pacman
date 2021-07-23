@@ -485,7 +485,7 @@ var Pacman = /*#__PURE__*/function () {
 
       var nextMovePos = this.pos + dir.movement; //check to see if pacman hits a wall
 
-      if (objectExist(nextMovePos, _setup.OBJECT_TYPE.WALL)) return; //do nothing
+      if (objectExist(nextMovePos, _setup.OBJECT_TYPE.WALL) || objectExist(nextMovePos, _setup.OBJECT_TYPE.GHOSTLAIR)) return; //do nothing
       //otherwise set the direction
 
       this.dir = dir;
