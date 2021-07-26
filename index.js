@@ -7,10 +7,18 @@ import { randomMovement } from './ghostMoves';
 //import classes
 import GameBoard from './GameBoard';
 
-//import Pacman
+//import Pacman and Ghosts
 import Pacman from './Pacman';
 
 import Ghost from './Ghost';
+
+//import sounds
+import soundDot from './sounds/munch.wav';
+import soundPill from './sounds/pill.wav';
+import soundGameStart from './sounds/game_start.wav';
+import soundGameOver from './sounds/death.wav';
+import soundGhost from './sounds/eat_ghost.wav';
+
 
 //grab DOM elements
 
@@ -30,7 +38,14 @@ let gameWin = false;
 let powerPillActive = false;
 let powerPillTimer = null;
 
+//function to play the sounds
+function playAudio(audio) {
+    const soundEffect = new Audio(audio);
+    soundEffect.play();
+}
+
 function gameOver(pacman, grid) {
+    playAudio(soundGameOver);
     document.removeEventListener('keydown', e =>
         pacman.handleKeyInput(e, gameBoard.objectExist)
     );
@@ -45,12 +60,20 @@ function checkCollision(pacman, ghosts) {
     const collidedGhost = ghosts.find(ghost => pacman.pos === ghost.pos);
     if (collidedGhost) {
         if (pacman.powerPill) {
-            gameBoard.removeObject(collidedGhost.pos, [
-                OBJECT_TYPE.GHOST,
-                OBJECT_TYPE.SCARED,
-                collidedGhost.name
-            ]);
-            collidedGhost.pos = collidedGhost.startPos;
+            playAudio(soundGhost)
+
+            ghosts.forEach((ghost, i) => {
+                if (collidedGhost.name === ghost.name) {
+                    gameBoard.removeObject(collidedGhost.pos, [
+                        OBJECT_TYPE.GHOST,
+                        OBJECT_TYPE.SCARED,
+                        collidedGhost.name
+                    ]);
+                    //reset the ghost to start position
+                    collidedGhost.pos = collidedGhost.startPos;
+                }
+            })
+
             score += 100;
         } else {
             //if he dies remove him from the gameboard
@@ -71,6 +94,7 @@ function gameLoop(pacman, ghosts) {
 
     //if pacman eats a dot
     if (gameBoard.objectExist(pacman.pos, OBJECT_TYPE.DOT)) {
+        playAudio(soundDot);
         gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.DOT])
         //remove dot
         gameBoard.dotCount--;
@@ -81,6 +105,8 @@ function gameLoop(pacman, ghosts) {
 
     //check if pacman eats a powerpill
     if (gameBoard.objectExist(pacman.pos, OBJECT_TYPE.PILL)) {
+        playAudio(soundPill);
+
         gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.PILL]);
 
         pacman.powerPill = true;
@@ -111,6 +137,7 @@ function gameLoop(pacman, ghosts) {
 }
 
 function startGame() {
+    playAudio(soundGameStart)
     // console.log('dammitman')
     //reset variables
     gameWin = false;
