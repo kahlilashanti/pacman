@@ -2,11 +2,15 @@
 
 import { LEVEL, OBJECT_TYPE } from './setup';
 
+import { randomMovement } from './ghostMoves';
+
 //import classes
 import GameBoard from './GameBoard';
 
 //import Pacman
 import Pacman from './Pacman';
+
+import Ghost from './Ghost';
 
 //grab DOM elements
 
@@ -31,12 +35,32 @@ function gameOver(pacman, grid) {
 }
 
 function checkCollision(pacman, ghosts) {
-
+    const collidedGhost = ghosts.find(ghost => pacman.pos === ghost.pos);
+    if (collidedGhost) {
+        if (pacman.powerPill) {
+            gameBoard.removeObject(collidedGhost.pos, [
+                OBJECT_TYPE.GHOST,
+                OBJECT_TYPE.SCARED,
+                collidedGhost.name
+            ]);
+            collidedGhost.pos = collidedGhost.startPos;
+            score += 100;
+        } else {
+            //if he dies remove him from the gameboard
+            gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.PACMAN]);
+            gameBoard.rotateDiv(pacman.pos, 0);
+            gameOver(pacman, gameGrid);
+        }
+    }
 }
 
 function gameLoop(pacman, ghosts) {
     // console.log('it works!')
     gameBoard.moveCharacter(pacman);
+    checkCollision(pacman, ghosts);
+
+    ghosts.forEach(ghost => gameBoard.moveCharacter(ghost));
+    checkCollision(pacman, ghosts);
 }
 
 function startGame() {
@@ -60,7 +84,15 @@ function startGame() {
     document.addEventListener('keydown', (e) =>
         pacman.handleKeyInput(e, gameBoard.objectExist));
 
-    timer = setInterval(() => gameLoop(pacman), GLOBAL_SPEED)
+    //create ghosts
+    const ghosts = [
+        new Ghost(5, 188, randomMovement, OBJECT_TYPE.BLINKY),
+        new Ghost(4, 209, randomMovement, OBJECT_TYPE.PINKY),
+        new Ghost(1, 230, randomMovement, OBJECT_TYPE.INKY),
+        new Ghost(8, 251, randomMovement, OBJECT_TYPE.CLYDE)
+    ]
+
+    timer = setInterval(() => gameLoop(pacman, ghosts), GLOBAL_SPEED)
 
 }
 
