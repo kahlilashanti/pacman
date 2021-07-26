@@ -645,7 +645,14 @@ var gameWin = false;
 var powerPillActive = false;
 var powerPillTimer = null;
 
-function gameOver(pacman, grid) {}
+function gameOver(pacman, grid) {
+  document.removeEventListener('keydown', function (e) {
+    return pacman.handleKeyInput(e, gameBoard.objectExist);
+  });
+  gameBoard.showGameStatus(gameWin);
+  clearInterval(timer);
+  startButton.classList.remove('hide');
+}
 
 function checkCollision(pacman, ghosts) {
   var collidedGhost = ghosts.find(function (ghost) {
@@ -730,7 +737,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59755" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59940" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
