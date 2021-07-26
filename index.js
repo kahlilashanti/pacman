@@ -35,13 +35,32 @@ function gameOver(pacman, grid) {
 }
 
 function checkCollision(pacman, ghosts) {
-
+    const collidedGhost = ghosts.find(ghost => pacman.pos === ghost.pos);
+    if (collidedGhost) {
+        if (pacman.powerPill) {
+            gameBoard.removeObject(collidedGhost.pos, [
+                OBJECT_TYPE.GHOST,
+                OBJECT_TYPE.SCARED,
+                collidedGhost.name
+            ]);
+            collidedGhost.pos = collidedGhost.startPos;
+            score += 100;
+        } else {
+            //if he dies remove him from the gameboard
+            gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.PACMAN]);
+            gameBoard.rotateDiv(pacman.pos, 0);
+            gameOver(pacman, gameGrid);
+        }
+    }
 }
 
 function gameLoop(pacman, ghosts) {
     // console.log('it works!')
     gameBoard.moveCharacter(pacman);
-    ghosts.forEach(ghost => gameBoard.moveCharacter(ghost))
+    checkCollision(pacman, ghosts);
+
+    ghosts.forEach(ghost => gameBoard.moveCharacter(ghost));
+    checkCollision(pacman, ghosts);
 }
 
 function startGame() {
